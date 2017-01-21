@@ -26,7 +26,7 @@ app.get('/todos', function (req, res) {
 	if (reqParams.hasOwnProperty('q')) {
 		console.log('q = \'' + reqParams.q + '\'');
 		filteredTodos = _.filter(filteredTodos, function (todo) {
-			return todo.description.indexOf(reqParams.q.trim()) > -1;
+			return todo.description.toLowerCase().indexOf(reqParams.q.trim().toLowerCase()) > -1;
         })
 	}
 	res.json(filteredTodos);
