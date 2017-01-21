@@ -22,6 +22,13 @@ app.get('/todos', function (req, res) {
 	} else if (reqParams.hasOwnProperty('completed') && reqParams.completed === 'false') {
 		filteredTodos = _.where(filteredTodos, {completed: false});
 	}
+
+	if (reqParams.hasOwnProperty('q')) {
+		console.log('q = \'' + reqParams.q + '\'');
+		filteredTodos = _.filter(filteredTodos, function (todo) {
+			return todo.description.indexOf(reqParams.q.trim()) > -1;
+        })
+	}
 	res.json(filteredTodos);
 });
 
