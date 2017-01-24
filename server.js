@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./db');
 
 var PORT = process.env.PORT || 3000;
 var todos = [];
@@ -32,6 +33,8 @@ app.get('/todos', function (req, res) {
 	res.json(filteredTodos);
 });
 
+// GET /todos/:id
+
 app.get('/todos/:id', function (req, res) {
 	var todoId = parseInt(req.params.id);
 	var matchedTodo = _.findWhere(todos, {id: todoId});
@@ -42,20 +45,40 @@ app.get('/todos/:id', function (req, res) {
 	}
 });
 
+// POST /todos
+
 app.post('/todos', function (req, res) {
 	var body = _.pick(req.body, 'completed', 'description');
+
+
 
 	if (!_.isBoolean(body.completed) || !_.isString(body.description) || _.isEmpty(body.description)) {
 		return res.status(400).send("Bad Request");
 	}
 
-	body.description = body.description.trim();
+	db.todo.create(body
+		/*{
+		description: body.description.trim(),
+		completed: body.completed
+	}*/
+		).then(function (todo) {
+		console.log('successfully inserted row = [' + todo + ']');
+		res.json(todo);
+    }, function (error) {
+		console.log('unable to create row = [' + error + ']');
+		res.status(500).json(error);
+    }).catch(function (err) {
+		console.log('unable to create row, reason = ' + err);
+		res.status(500).json(err);
+    });
+
+	/*body.description = body.description.trim();
 	body.id = todoNextId;
 	todoNextId++;
 	todos.push(body);
 
 	console.log(body);
-	res.send(body);
+	res.send(body);*/
 });
 
 // DELETE /todos/:id
@@ -100,6 +123,11 @@ app.put('/todos/:id', function (req, res) {
 
 });
 
-app.listen(PORT, function() {
-	console.log('Express listening on PORT ' + PORT);
+db.sequelize.sync().then(function () {
+	console.log('Database synced...');
+    app.listen(PORT, function() {
+        console.log('Express listening on PORT ' + PORT);
+    });
 });
+
+

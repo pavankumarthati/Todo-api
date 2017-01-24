@@ -35,13 +35,13 @@ sequelize.sync({
     /*Todo.create({
         description: 'Walk the dog'
     })
-        .then(function () {
+        .then(function (/* todo *//*) {
         return Todo.create({
             description: 'clean the trash',
             completed: true
         });
     })
-        .then(function () {
+        .then(function (/*todo*//*) {
             return Todo.findAll({
                 where: {
                     /!*completed: false*!/
@@ -53,13 +53,13 @@ sequelize.sync({
         })
         .then(function (todos) {
             if (todos) {
-                todos.forEach(function (todo) {
+                todos.forEach(function (*//*todo*//*) {
                     console.log(todo.toJSON());
                 });
             } else {
                 console.log('no todos found');
             }
-        })*/
+        }) */
         /*
         .then(function () {
         return Todo.findById(1);
