@@ -36,49 +36,35 @@ app.get('/todos', function (req, res) {
 // GET /todos/:id
 
 app.get('/todos/:id', function (req, res) {
-	var todoId = parseInt(req.params.id);
-	var matchedTodo = _.findWhere(todos, {id: todoId});
-	if  (matchedTodo) {
-		res.json(matchedTodo);
-	} else {
-		res.status(404).send();
-	}
+	var todoId = parseInt(req.params.id, 10);
+	db.todo.findById(todoId).then(function (todo) {
+        if (!!todo) { // evaluating object as true or false
+    	    console.log('todo = ' + JSON.stringify(todo));
+        	res.json(todo);
+	    } else {
+        	res.status(404).send('unable to find todo with id=' + todoId);
+		}
+    }, function (error) {
+		console.log('oops something went wrong = ' + error);
+		res.status(500).json(error);
+    });
 });
 
 // POST /todos
 
 app.post('/todos', function (req, res) {
 	var body = _.pick(req.body, 'completed', 'description');
-
-
-
 	if (!_.isBoolean(body.completed) || !_.isString(body.description) || _.isEmpty(body.description)) {
 		return res.status(400).send("Bad Request");
 	}
 
-	db.todo.create(body
-		/*{
-		description: body.description.trim(),
-		completed: body.completed
-	}*/
-		).then(function (todo) {
+	db.todo.create(body).then(function (todo) {
 		console.log('successfully inserted row = [' + todo + ']');
 		res.json(todo);
     }, function (error) {
 		console.log('unable to create row = [' + error + ']');
 		res.status(500).json(error);
-    }).catch(function (err) {
-		console.log('unable to create row, reason = ' + err);
-		res.status(500).json(err);
     });
-
-	/*body.description = body.description.trim();
-	body.id = todoNextId;
-	todoNextId++;
-	todos.push(body);
-
-	console.log(body);
-	res.send(body);*/
 });
 
 // DELETE /todos/:id
