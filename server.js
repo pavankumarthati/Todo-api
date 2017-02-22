@@ -121,6 +121,36 @@ app.put('/todos/:id', function (req, res) {
 
 });
 
+// POST /users
+app.post('/users', function (req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+	db.user.create(body).then(function (user) {
+		res.json(user.toJSON());
+    }, function (error) {
+		res.status(400).json(error);
+    });
+});
+
+// GET /users?u=pavankumar.thati@gmail.com
+app.get('/users', function (req, res) {
+	var query = req.query;
+	var where = {};
+	if (query.hasOwnProperty('u') && !_.isEmpty(query.u)) {
+		where.email = query.u;
+	}
+
+	db.user.findAll({
+		where: where
+	}).then(function (users) {
+		if (users && users.length > 0) {
+			res.json(users);
+		} else {
+			res.status(404).send();
+		}
+    }, function (error) {
+		res.status(500).json(error);
+    })
+});
 
 db.sequelize.sync().then(function () {
 	console.log('Database synced...');
